@@ -1025,6 +1025,7 @@ ActiveRecord::Schema.define(version: 2023_06_13_063121) do
     t.float "molecular_mass"
     t.string "sum_formula"
     t.jsonb "solvent"
+    t.boolean "dry_solvent", default: false
     t.boolean "inventory_sample", default: false
     t.index ["deleted_at"], name: "index_samples_on_deleted_at"
     t.index ["identifier"], name: "index_samples_on_identifier"

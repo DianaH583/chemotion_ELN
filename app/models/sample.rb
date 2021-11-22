@@ -42,6 +42,7 @@
 #  molecular_mass      :float
 #  sum_formula         :string
 #  solvent             :jsonb
+#  dry_solvent         :boolean          default(FALSE)
 #  inventory_sample    :boolean          default(FALSE)
 #
 # Indexes
@@ -346,7 +347,7 @@ class Sample < ApplicationRecord
   # rubocop:disable Style/MethodDefParentheses
   # rubocop:disable Style/OptionalBooleanParameter
   # rubocop:disable Layout/TrailingWhitespace
-  def create_subsample user, collection_ids, copy_ea = false, type = nil 
+  def create_subsample user, collection_ids, copy_ea = false, type = nil
     subsample = self.dup
     subsample.name = self.name if self.name.present?
     subsample.external_label = self.external_label if self.external_label.present?

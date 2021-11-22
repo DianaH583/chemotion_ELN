@@ -1,6 +1,14 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Radio, FormControl, Button, InputGroup, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import {
+  Radio,
+  FormControl,
+  Button,
+  InputGroup,
+  OverlayTrigger,
+  Tooltip,
+  Checkbox,
+} from 'react-bootstrap';
 import { DragSource, DropTarget } from 'react-dnd';
 import { compose } from 'redux';
 import DragDropItemTypes from 'src/components/DragDropItemTypes';
@@ -224,18 +232,18 @@ class Material extends Component {
           />
         );
       } else {
-        return (         
-            <div>
-              <FormControl
-                name='yield'
-                type="text"
-                bsClass="bs-form--compact form-control"
-                bsSize="small"
-                value={`${((material.equivalent <= 1 ? material.equivalent || 0 : 1) * 100).toFixed(0)}%`}
-                disabled
-              />
-            </div>
-        );
+        return (
+          <div>
+            <FormControl
+              name='yield'
+              type="text"
+              bsClass="bs-form--compact form-control"
+              bsSize="small"
+              value={`${((material.equivalent <= 1 ? material.equivalent || 0 : 1) * 100).toFixed(0)}%`}
+              disabled
+            />
+          </div>
+        )
       }
     }
     return (
@@ -433,6 +441,19 @@ class Material extends Component {
     }
   }
 
+  handleDrySolventChange(event) {
+    const value = event.target.checked;
+    if (this.props.onChange) {
+      const e = {
+        type: 'drysolventChanged',
+        materialGroup: this.props.materialGroup,
+        sampleID: this.materialId(),
+        dry_solvent: value
+      };
+      this.props.onChange(e);
+    }
+  }
+
   materialId() {
     return this.material().id;
   }
@@ -502,7 +523,7 @@ class Material extends Component {
         <td>
           <OverlayTrigger
             delay="100"
-            placement="top" 
+            placement="top"
             overlay={
               <Tooltip id="molecular-weight-info">{this.generateMolecularWeightTooltipText(material,reaction)}</Tooltip>
             }>
@@ -596,6 +617,7 @@ class Material extends Component {
       connectDropTarget, reaction } = props;
     const isTarget = material.amountType === 'target';
     const mw = material.molecule && material.molecule.molecular_weight
+    const drySolvTooltip = <Tooltip>Dry Solvent</Tooltip>;
     return (
       <tr className="solvent-material">
         {compose(connectDragSource, connectDropTarget)(
@@ -607,6 +629,14 @@ class Material extends Component {
 
         <td style={{ width: '25%', maxWidth: '50px' }}>
           {this.materialNameWithIupac(material)}
+        </td>
+        <td>
+          <OverlayTrigger placement="top" overlay={drySolvTooltip}>
+            <Checkbox
+              checked={material.dry_solvent}
+              onChange={(event) => this.handleDrySolventChange(event)}
+            />
+          </OverlayTrigger>
         </td>
         <td>
           {this.switchTargetReal(isTarget)}
