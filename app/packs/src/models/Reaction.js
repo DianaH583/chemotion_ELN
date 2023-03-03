@@ -13,7 +13,19 @@ import Container from 'src/models/Container';
 import UserStore from 'src/stores/alt/stores/UserStore';
 import Segment from 'src/models/Segment';
 
+import {
+  removeObsoleteMaterialsFromVariations,
+  addMissingMaterialsToVariations,
+  computeYield
+} from 'src/apps/mydb/elements/details/reactions/variationsTab/ReactionVariationsUtils';
+
 const TemperatureUnit = ['°C', '°F', 'K'];
+
+const TemperatureDefault = {
+  valueUnit: '°C',
+  userText: '',
+  data: []
+};
 
 const MomentUnit = {
   'Week(s)': 'weeks',
@@ -74,12 +86,6 @@ const highestUnitFromDuration = (d, threshold = 1.0) => {
 
 export default class Reaction extends Element {
   static buildEmpty(collection_id) {
-    const temperatureDefault = {
-      'valueUnit': '°C',
-      'userText': '',
-      'data': []
-    }
-
     const reaction = new Reaction({
       collection_id,
       container: Container.init(),
@@ -101,14 +107,15 @@ export default class Reaction extends Element {
       solvents: [],
       status: '',
       starting_materials: [],
-      temperature: temperatureDefault,
+      temperature: TemperatureDefault,
       timestamp_start: '',
       timestamp_stop: '',
       tlc_description: '',
       tlc_solvents: '',
       type: 'reaction',
       can_update: true,
-      can_copy: false
+      can_copy: false,
+      variations: []
     })
 
     reaction.short_label = this.buildReactionShortLabel()
@@ -172,8 +179,64 @@ export default class Reaction extends Element {
       temperature: this.temperature,
       timestamp_start: this.timestamp_start,
       timestamp_stop: this.timestamp_stop,
-      segments: this.segments.map(s => s.serialize())
+      segments: this.segments.map(s => s.serialize()),
+      variations: this.variations
     });
+  }
+
+  set variations(variations) {
+    // variations data structure (also see Entities::ReactionVariationEntity):
+    // [
+    //   {
+    //     "id": <number>,
+    //     "properties": {
+    //         "temperature": {"value": <number>, "unit": <string>},
+    //         "duration": {"value": <number>, "unit": <string>}
+    //     },
+    //     "startingMaterials": {
+    //         <material_id: {"value": <number>, "unit": <string>, "aux": {...}},
+    //         <material_id>: {"value": <number>, "unit": <string>, "aux": {...}},
+    //         ...
+    //     },
+    //     "reactants": {
+    //         <material_id: {"value": <number>, "unit": <string>, "aux": {...}},
+    //         <material_id>: {"value": <number>, "unit": <string>, "aux": {...}},
+    //         ...
+    //     },
+    //     "products": {
+    //         <material_id: {"value": <number>, "unit": <string>, "aux": {...}},
+    //         <material_id>: {"value": <number>, "unit": <string>, "aux": {...}},
+    //         ...
+    //     }
+    //   },
+    //   {
+    //     "id": "<number>",
+    //     ...
+    //   },
+    //   ...
+    // ]
+    if (!Array.isArray(variations) || !variations.length) {
+      this._variations = [];
+    } else {
+      const currentMaterials = {
+        startingMaterials: this.starting_materials,
+        reactants: this.reactants,
+        products: this.products
+      };
+      // Keep materials up-to-date. Materials could have been added or removed in the scheme tab
+      // (of the reaction detail modal); these changes need to be reflected in the variations.
+      let updatedVariations = removeObsoleteMaterialsFromVariations(variations, currentMaterials);
+      updatedVariations = addMissingMaterialsToVariations(updatedVariations, currentMaterials);
+      // The yields need to be updated, since the products' amounts could have been edited in
+      // the variations tab (of the reaction detail modal).
+      updatedVariations = computeYield(updatedVariations, this.hasPolymers());
+
+      this._variations = updatedVariations;
+    }
+  }
+
+  get variations() {
+    return this._variations;
   }
 
   // Reaction Duration
