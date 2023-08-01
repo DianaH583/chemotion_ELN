@@ -22,7 +22,12 @@ module Entities
       dataset_page = options[:dataset_page].to_i || 1
       start_index = (dataset_page - 1) * DATASETS_PER_PAGE
       end_index = start_index + DATASETS_PER_PAGE - 1
-      serialize_children(object.hash_tree(limit_depth: depth)[object].to_a.slice(start_index..end_index).to_h)
+
+      parent_objects = object.hash_tree(limit_depth: depth)[object].to_a
+      sorted_parents = parent_objects.sort_by { |container, _| container.created_at }.reverse
+      parents_slice = sorted_parents[start_index..end_index]
+
+      serialize_children(parents_slice.to_h)
     end
 
     def serialize_children(container_tree_hash)
@@ -49,7 +54,7 @@ module Entities
         attachable_type: 'Container',
         attachable_id: nil,
         created_for: object&.containable&.id,
-      )
+      ).order(created_at: :desc)
     end
 
     def all_descendants_attachments
@@ -59,7 +64,7 @@ module Entities
                                                          FROM attachments AS sub_attachments
                                                          WHERE sub_attachments.attachable_id = attachments.attachable_id
                                                          LIMIT 50
-                                                       )")
+                                                       )").order(created_at: :desc)
     end
 
     def inbox_count
