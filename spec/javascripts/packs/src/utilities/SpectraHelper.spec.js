@@ -10,8 +10,8 @@ import Sample from 'src/models/Sample';
 import Container from 'src/models/Container';
 
 describe('SpectraHelper', () => {
-  describe('isNMRKind', () => {
-    describe('container is null or undefined', () => {
+  describe('.isNMRKind()', () => {
+    describe('when container is null or undefined:', () => {
       it('container is null', () => {
         expect(isNMRKind(null)).toEqual(false);
       });
@@ -21,13 +21,13 @@ describe('SpectraHelper', () => {
       });
     });
 
-    describe('container is neither not null nor undefined', () => {
-      it('container does not has extended_metadata', () => {
+    describe('when container is neither not null nor undefined:', () => {
+      it('when container does not has extended_metadata', () => {
         const container = 'Just a random value';
         expect(isNMRKind(container)).toEqual(false);
       });
 
-      describe('container has extended_metadata', () => {
+      describe('when container has extended_metadata', () => {
         it('metadata does not has kind value', () => {
           const container = { extended_metadata: {} };
           expect(isNMRKind(container)).toEqual(false);
@@ -46,8 +46,8 @@ describe('SpectraHelper', () => {
     });
   });
 
-  describe('BuildSpcInfosForNMRDisplayer', () => {
-    describe('sample or container is null or undefined', () => {
+  describe('.BuildSpcInfosForNMRDisplayer()', () => {
+    describe('when sample or container is null or undefined', () => {
       it('sample is null or undefined', () => {
         const specInfo1 = BuildSpcInfosForNMRDisplayer(null, 'just a random value');
         expect(specInfo1).toEqual([]);
@@ -65,7 +65,7 @@ describe('SpectraHelper', () => {
       });
     });
 
-    describe('it does not has any file to process', () => {
+    describe('when it does not has any file to process', () => {
       it('container does not has any attachment', () => {
         const container = { children: [{ attachments: [] }] };
         const specInfo = BuildSpcInfosForNMRDisplayer('just a random value', container);
@@ -88,7 +88,7 @@ describe('SpectraHelper', () => {
       });
     });
 
-    describe('it has file to be processed', () => {
+    describe('when it has file to be processed', () => {
       it('get spectra info', () => {
         const sample = Sample.buildEmpty();
         const analyses = Container.buildEmpty();
@@ -125,8 +125,8 @@ describe('SpectraHelper', () => {
     });
   });
 
-  describe('JcampIds', () => {
-    describe('Container does not have any child', () => {
+  describe('.JcampIds()', () => {
+    describe('when container does not have any child', () => {
       it('children is empty', () => {
         const container = Container.buildEmpty();
         const listJcampIds = JcampIds(container);
@@ -135,7 +135,7 @@ describe('SpectraHelper', () => {
       });
     });
 
-    describe('Container does not have jcamp file', () => {
+    describe('when container does not have jcamp file', () => {
       const container = Container.buildEmpty();
       const attachments = [{ filename: 'testfile.txt' }];
       container.children.push({ attachments });
@@ -145,7 +145,7 @@ describe('SpectraHelper', () => {
       expect(listJcampIds).toEqual(expectedValue);
     });
 
-    describe('Container has jcamp files', () => {
+    describe('when container has jcamp files', () => {
       let container;
 
       beforeEach(() => {
@@ -184,8 +184,8 @@ describe('SpectraHelper', () => {
     });
   });
 
-  describe('BuildSpcInfos', () => {
-    describe('sample or container is null or undefined', () => {
+  describe('.BuildSpcInfos()', () => {
+    describe('when sample or container is null or undefined', () => {
       it('sample is null or undefined', () => {
         const specInfo1 = BuildSpcInfos(null, 'just a random value');
         expect(specInfo1).toEqual([]);
@@ -203,7 +203,7 @@ describe('SpectraHelper', () => {
       });
     });
 
-    describe('it does not has any file to process', () => {
+    describe('when it does not has any file to process', () => {
       it('container does not has any attachment', () => {
         const container = { children: [{ attachments: [] }] };
         const specInfo = BuildSpcInfos('just a random value', container);
@@ -226,7 +226,7 @@ describe('SpectraHelper', () => {
       });
     });
 
-    describe('it has file to be processed', () => {
+    describe('when it has file to be processed', () => {
       it('get spectra info', () => {
         const sample = Sample.buildEmpty();
         const analyses = Container.buildEmpty();
