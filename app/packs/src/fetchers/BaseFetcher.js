@@ -60,6 +60,7 @@ export default class BaseFetcher {
     let userState;
     let group;
     let sort;
+    let direction;
     let filters;
 
     switch (type) {
@@ -71,9 +72,11 @@ export default class BaseFetcher {
         filters = userState?.profile?.data?.filters || {};
         group = filters.reaction?.group || 'created_at';
         sort = filters.reaction?.sort || false;
-        addQuery = group === 'none'
-          ? '&sort_column=created_at'
-          : `&sort_column=${sort && group ? group : 'updated_at'}`;
+        direction = filters.reaction?.direction || 'DESC';
+        if (group === 'none') {
+          group = 'created_at';
+        }
+        addQuery = `&sort_column=${(sort && group) || 'updated_at'}&sort_direction=${direction}`;
         break;
       case 'generic_elements':
         userState = UserStore.getState();
