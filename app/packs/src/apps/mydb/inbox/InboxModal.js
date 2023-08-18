@@ -104,12 +104,6 @@ export default class InboxModal extends React.Component {
     document.removeEventListener('mouseup', this.handleMouseUp);
   };
 
-  lockedSubtrees() {
-    const roots = this.state.lockedRoots;
-
-    return this.subtrees(roots, null, false);
-  }
-
   renderPagination = () => {
     const { currentPage, totalPages } = this.state;
 
