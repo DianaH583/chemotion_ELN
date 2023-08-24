@@ -19,7 +19,7 @@ module Chemotion
         optional :to_date, type: Integer, desc: 'created_date to in ms'
         optional :filter_created_at, type: Boolean, desc: 'filter by created at or updated at'
         optional :sort_column, type: String, desc: 'sort by created_at, updated_at, rinchi_short_key, or rxno',
-                               values: %w[created_at updated_at rinchi_short_key rxno]
+                               values: %w[created_at updated_at rinchi_short_key rxno none]
       end
       paginate per_page: 7, offset: 0
 
@@ -50,8 +50,9 @@ module Chemotion
         from = params[:from_date]
         to = params[:to_date]
         by_created_at = params[:filter_created_at] || false
-      
+
         sort_column = params[:sort_column].presence || 'created_at'
+        sort_column =  'created_at' if %w[none updated_at].include? sort_column
         sort_direction = %w[created_at updated_at].include?(sort_column) ? 'DESC' : 'ASC'
 
         scope = scope.includes_for_list_display.order("#{sort_column} #{sort_direction}")
