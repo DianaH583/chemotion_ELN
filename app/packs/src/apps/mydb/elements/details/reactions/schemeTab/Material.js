@@ -81,7 +81,7 @@ const notApplicableInput = () => (
   </td>
 );
 
-export const iupacNameTooltip = material => (
+const iupacNameTooltip = material => (
   <Tooltip id="iupac_name_tooltip" className="left_tooltip">
     <table>
       <tbody>
@@ -224,7 +224,7 @@ class Material extends Component {
           />
         );
       } else {
-        return (         
+        return (
             <div>
               <FormControl
                 name='yield'
@@ -502,7 +502,7 @@ class Material extends Component {
         <td>
           <OverlayTrigger
             delay="100"
-            placement="top" 
+            placement="top"
             overlay={
               <Tooltip id="molecular-weight-info">{this.generateMolecularWeightTooltipText(material,reaction)}</Tooltip>
             }>
